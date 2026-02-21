@@ -26,12 +26,13 @@ L.Icon.Default.mergeOptions({
 });
 
 const MapClickHandler = ({ onMapClick }) => {
-  useMapEvents({
+  useMapEvents({ f
     click: (e) => {
       onMapClick(e.latlng);
     },
   });
   return null;
+
 };
 
 const MapView = () => {
