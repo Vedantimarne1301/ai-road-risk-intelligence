@@ -1,65 +1,59 @@
 import pandas as pd
-import numpy as np
+from services.location_service import get_features_from_location
+from services.predict import predict_pipeline
 
 # Load dataset
 dataset = pd.read_csv("model/processed_dataset.csv")
 
-# Severity weights: 0=Fatal, 1=Serious, 2=Slight
-severity_weights = {0: 3, 1: 2, 2: 1}
+# Map string risk to numeric for frontend
+RISK_TO_SEV = {"High": 0, "Medium": 1, "Low": 2}
 
 
-def get_heatmap_data(sample_size=1000, severity_filter=None):
+def get_heatmap_data(sample_size=1000, radius_km=5.0):
     """
-    Returns heatmap data with optional severity filtering.
+    Returns heatmap points with model-aligned risk, compatible with frontend.
     """
-    data_subset = dataset.copy()
+    # Sample dataset for performance
+    if len(dataset) > sample_size:
+        data_subset = dataset.sample(sample_size, random_state=42)
+    else:
+        data_subset = dataset.copy()
 
-    if severity_filter is not None:
-        data_subset = data_subset[data_subset['Accident_Severity'] == severity_filter]
-
-    if len(data_subset) > sample_size:
-        data_subset = data_subset.sample(sample_size, random_state=42)
-
-    data = []
+    heatmap_points = []
     for _, row in data_subset.iterrows():
-        sev = int(row['Accident_Severity'])
-        weight = severity_weights.get(sev, 1)
+        lat = float(row["latitude"])
+        lon = float(row["longitude"])
 
-        # Base intensity by severity
-        if sev == 0:
-            base_intensity = 1.0
-        elif sev == 1:
-            base_intensity = 0.7
-        else:
-            base_intensity = 0.4
+        # Get features for prediction
+        features = get_features_from_location(lat, lon, use_aggregation=True)
+        prediction = predict_pipeline(features)
+        risk_level = prediction["risk_level"]
+        risk_score = prediction["risk_score"]
 
-        # Weighted by casualties
-        intensity = min(1.0, base_intensity * weight * (1 + row['Number_of_Casualties'] * 0.05))
+        # Numeric severity for frontend mapping
+        severity = RISK_TO_SEV[risk_level]
 
-        # Risk label
-        if sev == 0:
-            risk_label = "High Risk"
-        elif sev == 1:
-            risk_label = "Medium Risk"
-        else:
-            risk_label = "Low Risk"
+        # Intensity for visualization
+        intensity = {"High": 1.0, "Medium": 0.7, "Low": 0.4}[risk_level]
 
-        data.append({
-            "lat": float(row["latitude"]),
-            "lon": float(row["longitude"]),
-            "severity": sev,
-            "severity_label": risk_label,
-            "intensity": float(round(intensity, 2)),
-            "casualties": int(row["Number_of_Casualties"]),
-            "vehicles": int(row["Number_of_Vehicles"])
+        heatmap_points.append({
+            "lat": lat,
+            "lon": lon,
+            "severity": severity,        # numeric for frontend
+            "risk_level": risk_level,    # string
+            "risk_score": float(risk_score),
+            "intensity": float(intensity),
+            "top_factors": prediction["top_factors"],
+            "casualties": int(row.get("Number_of_Casualties", 0)),
+            "vehicles": int(row.get("Number_of_Vehicles", 0))
         })
 
-    return data
+    return heatmap_points
 
 
-def get_clustered_heatmap_data(grid_size=0.05):
+def get_clustered_heatmap_data(grid_size=0.05, radius_km=5.0):
     """
-    Returns aggregated heatmap data clustered by geographical grid
+    Returns aggregated heatmap clusters with model-aligned risk.
     """
     dataset_copy = dataset.copy()
 
@@ -67,49 +61,36 @@ def get_clustered_heatmap_data(grid_size=0.05):
     dataset_copy['lat_bin'] = (dataset_copy['latitude'] / grid_size).astype(int) * grid_size
     dataset_copy['lon_bin'] = (dataset_copy['longitude'] / grid_size).astype(int) * grid_size
 
-    # Aggregate by grid
-    clustered = dataset_copy.groupby(['lat_bin', 'lon_bin']).agg({
-        'Accident_Severity': ['count', 'min'],  # count + max severity
-        'Number_of_Casualties': 'sum',
-        'Number_of_Vehicles': 'sum'
-    }).reset_index()
+    clustered_points = []
+    grouped = dataset_copy.groupby(['lat_bin', 'lon_bin'])
 
-    clustered.columns = ['lat', 'lon', 'accident_count', 'max_severity', 'total_casualties', 'total_vehicles']
+    for (lat_bin, lon_bin), group in grouped:
+        # Center of grid
+        lat_center = lat_bin + grid_size / 2
+        lon_center = lon_bin + grid_size / 2
 
-    data = []
-    for _, row in clustered.iterrows():
-        max_sev = int(row['max_severity'])
-        high_sev_count = int((dataset_copy[
-            (dataset_copy['latitude'] >= row['lat']) &
-            (dataset_copy['latitude'] < row['lat'] + grid_size) &
-            (dataset_copy['longitude'] >= row['lon']) &
-            (dataset_copy['longitude'] < row['lon'] + grid_size)
-        ]['Accident_Severity'] <= 1).sum())
+        # Get features & prediction for center
+        features = get_features_from_location(lat_center, lon_center, use_aggregation=True)
+        prediction = predict_pipeline(features)
+        risk_level = prediction["risk_level"]
+        risk_score = prediction["risk_score"]
+        severity = RISK_TO_SEV[risk_level]
 
-        # Base intensity
-        severity_factor = (3 - max_sev) / 3  # 0=fatal => highest
-        base_intensity = min(1.0, (row['accident_count'] / 50) * 0.6 + severity_factor * 0.4)
+        intensity = {"High": 1.0, "Medium": 0.7, "Low": 0.4}[risk_level]
 
-        # Risk label
-        if max_sev == 0:
-            risk_label = "High Risk"
-        elif max_sev == 1:
-            risk_label = "Medium Risk"
-        else:
-            risk_label = "Low Risk"
-
-        data.append({
-            "lat": float(row['lat'] + grid_size/2),  # center of grid
-            "lon": float(row['lon'] + grid_size/2),
-            "accident_count": int(row['accident_count']),
-            "max_severity": max_sev,
-            "high_severity_count": high_sev_count,
-            "total_casualties": int(row['total_casualties']),
-            "total_vehicles": int(row['total_vehicles']),
-            "intensity": float(round(base_intensity, 2)),
-            "severity_label": risk_label
+        clustered_points.append({
+            "lat": lat_center,
+            "lon": lon_center,
+            "severity": severity,        # numeric for frontend
+            "risk_level": risk_level,
+            "risk_score": float(risk_score),
+            "intensity": float(intensity),
+            "top_factors": prediction["top_factors"],
+            "accident_count": len(group),
+            "total_casualties": int(group["Number_of_Casualties"].sum()),
+            "total_vehicles": int(group["Number_of_Vehicles"].sum())
         })
 
-    # Sort clusters by intensity descending
-    data.sort(key=lambda x: x['intensity'], reverse=True)
-    return data[:500]  # return top 500 clusters
+    # Sort by intensity descending
+    clustered_points.sort(key=lambda x: x['intensity'], reverse=True)
+    return clustered_points[:500]  # top 500 clusters
