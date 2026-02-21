@@ -16,15 +16,12 @@ multidict
 mypy_extensions
 numba
 numpy
-orjson
 packaging
 pandas
 pydantic
 pydantic-settings
 pydantic_core
-python-dateutil
 python-dotenv
-PyYAML
 scikit-learn
 scipy
 shap

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -211,7 +211,10 @@ def predict(data: AccidentInput):
 
 
 @app.post("/predict_location")
-def predict_location(lat: float, lon: float):
+def predict_location(
+    lat: float = Query(..., description="Latitude of the location"),
+    lon: float = Query(..., description="Longitude of the location")
+):
     """
     Location-based prediction using latitude and longitude
     Finds nearest accident and predicts risk
