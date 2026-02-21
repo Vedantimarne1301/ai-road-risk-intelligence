@@ -1,0 +1,26 @@
+.App {
+  min-height: 100vh;
+  background: var(--bg-dark);
+}
+
+.main-content {
+  min-height: calc(100vh - 80px);
+}
+
+/* Animations */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Smooth Transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
