@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 from services.predict import predict_pipeline
 from services.location_service import get_features_from_location
 from agents.agent_controller import agent_pipeline
