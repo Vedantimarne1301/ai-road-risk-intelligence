@@ -11,34 +11,32 @@ FEATURES_PATH = "model/model_features.pkl"
 dataset = pd.read_csv(DATA_PATH)
 feature_columns = joblib.load(FEATURES_PATH)
 
-# KD-Tree for fast spatial queries
+# KD-Tree for spatial queries
 coords = dataset[['latitude', 'longitude']].values
 kdtree = cKDTree(coords)
 
-# Map string risk to numeric for frontend
+# Map string risk to numeric (frontend)
 RISK_TO_SEV = {"High": 0, "Medium": 1, "Low": 2}
 
 
 def find_nearest_accidents(lat, lon, k=50):
     distances, indices = kdtree.query([lat, lon], k=k)
     nearest = dataset.iloc[indices].copy()
-    nearest['distance_km'] = distances * 111  # Approx degrees → km
+    nearest['distance_km'] = distances * 111  # approx conversion
     return nearest
 
 
 def aggregate_location_features(lat, lon, radius_km=5.0):
     """
-    Aggregate features from nearby accidents using distance weighting.
+    Aggregate features using distance-weighted median/mean.
     """
     nearby = find_nearest_accidents(lat, lon, k=50)
     in_radius = nearby[nearby['distance_km'] <= radius_km]
-
-    # Fallback if no accidents in radius
     if len(in_radius) == 0:
         in_radius = nearby.head(10)
 
     feature_dict = {}
-    weights = 1 / (in_radius['distance_km'] + 0.1)  # closer accidents matter more
+    weights = 1 / (in_radius['distance_km'] + 0.1)  # prevent divide by zero
 
     for col in feature_columns:
         if col == 'latitude':
@@ -54,7 +52,7 @@ def aggregate_location_features(lat, lon, radius_km=5.0):
         else:
             feature_dict[col] = np.nan
 
-    # Contextual features
+    # Add context features
     feature_dict['accident_count_radius'] = len(in_radius)
     feature_dict['avg_severity_radius'] = float(in_radius['Accident_Severity'].mean())
     feature_dict['nearest_accident_km'] = float(in_radius['distance_km'].min())
@@ -80,7 +78,7 @@ def predict_risk_for_location(lat, lon):
     """
     Predict risk for a location.
     """
-    features = get_features_from_location(lat, lon, use_aggregation=True)
+    features = get_features_from_location(lat, lon)
     prediction = predict_pipeline(features)
     prediction['severity'] = RISK_TO_SEV[prediction['risk_level']]
     return prediction
