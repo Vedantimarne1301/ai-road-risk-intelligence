@@ -1,5 +1,3 @@
-dataclasses-json
-distro
 fastapi
 frozenlist
 groq
@@ -10,21 +8,17 @@ joblib
 jsonpatch
 jsonpointer
 langchain
-langchain-classic
 langchain-community
 langchain-core
 langchain-groq
-langchain-text-splitters
 marshmallow
 multidict
 mypy_extensions
 numba
 numpy
 orjson
-ormsgpack
 packaging
 pandas
-propcache
 pydantic
 pydantic-settings
 pydantic_core
@@ -36,6 +30,4 @@ scipy
 shap
 uvicorn
 xgboost
-xxhash
 yarl
-zstandard
