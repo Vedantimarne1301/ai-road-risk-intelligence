@@ -370,7 +370,7 @@ const Dashboard = () => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={riskFactors.weather_conditions}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="condition" stroke="var(--text-secondary)" angle={-15} textAnchor="end" height={80} />
+              <XAxis dataKey="condition" stroke="var(--text-secondary)" angle={0} textAnchor="end" height={80} />
               <YAxis stroke="var(--text-secondary)" />
               <Tooltip
                 contentStyle={{

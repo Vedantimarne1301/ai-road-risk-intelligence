@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Activity, BarChart3, Map } from 'lucide-react';
+import { Activity, BarChart3, Map, MessageSquareIcon } from 'lucide-react';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -9,6 +9,7 @@ const Navbar = () => {
   const navItems = [
     { path: '/', icon: BarChart3, label: 'Dashboard' },
     { path: '/map', icon: Map, label: 'Risk Map' },
+    { path: '/safety-ai', icon: MessageSquareIcon, label: 'Safety AI' },
   ];
 
   return (

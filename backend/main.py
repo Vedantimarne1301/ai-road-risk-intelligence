@@ -10,6 +10,10 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 from services.predict import predict_pipeline
 from services.location_service import get_features_from_location
 from agents.agent_controller import agent_pipeline
+from pydantic import BaseModel
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel  
 from services.heatmap_service import get_heatmap_data, get_clustered_heatmap_data
 from services.dashboard_service import (
     get_dashboard_statistics,
@@ -33,6 +37,48 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class AIQuery(BaseModel):
+    question: str
+
+
+@app.post("/ai_safety_chat")
+def ai_safety_chat(data: AIQuery):
+    try:
+        from agents.safety_agent import safety_agent_pipeline
+
+        answer = safety_agent_pipeline({
+            "risk_level": "General",
+            "risk_score": 0,
+            "top_factors": []
+        }, custom_question=data.question)
+
+        return {"answer": answer}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------
+# NEW: /ask-safety-ai endpoint (simulated AI response)
+# ---------------------------------------------------
+class Question(BaseModel):
+    question: str
+
+@app.post("/ask-safety-ai")
+async def ask_safety_ai(data: Question):
+    response_text = f"""
+    AI Risk Analysis:
+    Based on your query: "{data.question}"
+    • Consider speed limit enforcement.
+    • Increase traffic monitoring during peak hours.
+    • Deploy traffic police in high-risk zones.
+    • Improve road lighting and signage.
+    This is a simulated AI response.
+    """
+    return {
+        "answer": response_text.strip()
+    }
 
 
 # ---------------------------------------------------

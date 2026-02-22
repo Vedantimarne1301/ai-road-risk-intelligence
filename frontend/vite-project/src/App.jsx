@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import MapView from './pages/MapView';
+import SafetyAI from "./pages/SafetyAi";
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/map" element={<MapView />} />
+            <Route path="/safety-ai" element={<SafetyAI />} />
           </Routes>
         </main>
 
@@ -46,6 +48,7 @@ function App() {
         />
       </div>
     </Router>
+    
   );
 }
 

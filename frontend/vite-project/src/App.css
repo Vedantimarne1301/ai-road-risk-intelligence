@@ -1,26 +1,26 @@
 .App {
   min-height: 100vh;
-  background: var(--bg-dark);
+  background: #F8FAFC; /* Soft professional white-gray */
+  color: #111827;
 }
 
 .main-content {
   min-height: calc(100vh - 80px);
 }
 
-/* Animations */
+/* Remove unnecessary gradient animation */
 @keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Smooth Transitions */
+/* Smooth professional transitions */
 * {
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: 
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
