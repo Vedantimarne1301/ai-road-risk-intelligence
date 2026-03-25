@@ -1,0 +1,326 @@
+.map-view {
+  display: flex;
+  height: calc(100vh - 80px);
+  position: relative;
+  overflow: hidden;
+  background: #F8FAFC;
+}
+
+/* ===============================
+   SIDEBAR
+=================================*/
+
+.map-sidebar {
+  width: 380px;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: width 0.3s ease;
+}
+
+.map-sidebar.collapsed {
+  width: 75px;
+}
+
+.sidebar-header {
+  padding: 1.8rem;
+  border-bottom: 1px solid #E5E7EB;
+  background: #F9FAFB;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1E3A8A;
+}
+
+.title-icon {
+  color: #2563EB;
+}
+
+.sidebar-subtitle {
+  color: #6B7280;
+  font-size: 0.85rem;
+}
+
+/* ===============================
+   CONTROLS
+=================================*/
+
+.map-controls {
+  padding: 1.5rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.control-header {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #374151;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+.control-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.control-checkbox:hover {
+  background: #F1F5F9;
+}
+
+.control-checkbox input[type="checkbox"] {
+  accent-color: #2563EB;
+}
+
+.control-checkbox span {
+  color: #4B5563;
+  font-size: 0.85rem;
+}
+
+/* ===============================
+   FILTER BUTTONS
+=================================*/
+
+.filter-btn {
+  padding: 0.7rem;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  color: #4B5563;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  border-color: #2563EB;
+  background: #EFF6FF;
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: #2563EB;
+  color: white;
+  border-color: #2563EB;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.filter-btn.high.active { background: #DC2626; }
+.filter-btn.medium.active { background: #F59E0B; }
+.filter-btn.low.active { background: #16A34A; }
+
+/* ===============================
+   LEGEND
+=================================*/
+
+.legend {
+  background: #F9FAFB;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  margin-top: 1rem;
+}
+
+.legend-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+.legend-item {
+  font-size: 0.85rem;
+  color: #4B5563;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ===============================
+   EXPANDED RISK PANEL
+=================================*/
+
+.risk-analysis-expanded {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  max-width: 1100px;
+  height: calc(100vh - 140px);
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.expanded-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem 2rem;
+  border-bottom: 1px solid #E5E7EB;
+  background: #F9FAFB;
+}
+
+.expanded-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1E3A8A;
+}
+
+.expanded-subtitle {
+  font-size: 0.85rem;
+  color: #6B7280;
+  font-family: monospace;
+}
+
+/* ===============================
+   HERO CARD
+=================================*/
+
+.risk-hero-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  transition: all 0.2s ease;
+}
+
+.risk-hero-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.risk-hero-value {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: #DC2626;
+}
+
+.risk-hero-confidence {
+  font-size: 0.9rem;
+  color: #6B7280;
+}
+
+/* ===============================
+   SECTIONS
+=================================*/
+
+.expanded-section {
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 1.5rem;
+  border: 1px solid #E5E7EB;
+  transition: all 0.2s ease;
+}
+
+.expanded-section:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+}
+
+.section-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* ===============================
+   DRIVERS
+=================================*/
+
+.driver-card {
+  padding: 1rem;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.driver-card:hover {
+  background: #E5E7EB;
+  transform: translateY(-2px);
+}
+
+.driver-number {
+  background: #2563EB;
+  color: white;
+}
+
+/* ===============================
+   RECOMMENDATIONS
+=================================*/
+
+.recommendation-card {
+  padding: 1.25rem;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.recommendation-card:hover {
+  border-color: #16A34A;
+  background: #ECFDF5;
+  transform: translateX(4px);
+}
+
+/* ===============================
+   MAP LOADING
+=================================*/
+
+.map-loading-overlay {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(2px);
+}
+
+.map-loading-overlay p {
+  color: #374151;
+}
+
+/* ===============================
+   POPUP
+=================================*/
+
+.custom-popup {
+  background: #FFFFFF;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+}
+
+.custom-popup h4 {
+  color: #1E3A8A;
+  font-weight: 600;
+}
+
+.custom-popup p {
+  color: #4B5563;
+}
+
+/* Dimmed background */
+.map-container-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  height: 100%;
+}
